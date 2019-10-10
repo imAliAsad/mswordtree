@@ -60,7 +60,7 @@ parent = root
 def CreateHeading(block):
     global parent
     item = Item()
-    item.Content = block.text
+    item.Content = block.text.strip()
     item.Type = block.style.name   
     
     parentLevel = GetHeadingLevel(parent.Type) if parent.Type != 'root' else 0   
@@ -70,7 +70,7 @@ def CreateHeading(block):
     # If the heading is new then add it to the root level
     if (GetHeadingLevel(item.Type) == 1): 
         root.Items.append(item) 
-        item.Parent = item
+        item.Parent = root#item
         parent = item
     
     # Check if the new heading is a subheading of its parent or not
@@ -114,7 +114,7 @@ def GetLastHeading():
 def AddParagraph(head, block):
     item = Item()
     item.Type = block.style.name
-    item.Content = block.text
+    item.Content = block.text.strip()
     item.Parent = head
     head.Items.append(item)   
    
@@ -139,20 +139,20 @@ def GetWordDocTree(filename):
     parent = root
     
     head = root    
-    for block in iter_block_items(doc): 
-        if 'Heading'in block.style.name: #Heading
+    for block in iter_block_items(doc):
+
+        if ('Heading' in block.style.name) and len(block.text.strip()) > 0: #Heading
             
             head = CreateHeading(block)            
             pass
             
         
-        if isinstance(block, Table): #Table 
-            
+        if isinstance(block, Table): #Table             
             AddTable(head, block)
             pass
             
         
-        else: # Paragraph and everything
+        elif len(block.text.strip()) > 0: # Paragraph and everything
             AddParagraph(head, block)
             pass
             
