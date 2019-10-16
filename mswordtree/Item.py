@@ -38,7 +38,20 @@ class Item(JSONEncoder):
     def toJSON(self):
         return json.dumps(self, default=lambda obj: obj.__dict__)
 
+    def Find(self, guid):
+        return self.FindItem(guid)
 
+    def FindItem(self, guid):
+        obj = None
+        for head in self.GetSubHeadings(): 
+            if obj is None:             
+                if str(head.GUID).strip() == str(guid).strip():                     
+                    obj = head                    
+                else:
+                    obj = head.FindItem(guid)
+                
+        
+        return obj
 
 
 

@@ -39,6 +39,7 @@ def ParseTableToDataFrame(table):
         
 
     df = pd.DataFrame(data)
+    df = df.fillna('')
     return df
 
 def GetHeadingLevel(stylename):
