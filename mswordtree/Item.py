@@ -18,7 +18,7 @@ class Item(JSONEncoder):
         heads = list(filter(lambda item: 'Heading' in item.Type, self.Items))
         items = []
         for index, head in enumerate(heads):
-            if index == 0:                
+            if (index == 0) and (self.Content == head.Content):                
                 continue    # reason we're ignoring the first element because it is redundant heading i.e (head == subhead)
             items.append(head)
         return items   
@@ -26,7 +26,7 @@ class Item(JSONEncoder):
     def GetTables(self):
         return list(filter(lambda item: 'Table' in item.Type, self.Items))
 
-    def GetParagraph(self):
+    def GetContent(self):
         return list(filter(lambda item: 'Heading' not in item.Type, self.Items))
     
     def GetChildren(self):

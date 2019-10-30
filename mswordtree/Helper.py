@@ -1,11 +1,13 @@
 
 def recurse(root, filename, nodes):    
     
-    for child in root.GetContent():        
+    children = root.GetContent()
+    for child in children:        
         obj = JsonObject_Item(filename, root, child)        
         nodes.append(obj)        
 
-    for child in root.GetSubHeadings():
+    subheadings = root.GetSubHeadings()
+    for child in subheadings:
         obj = JsonObject_Item(filename, root, child)        
         nodes.append(obj)
         recurse(child, filename, nodes)

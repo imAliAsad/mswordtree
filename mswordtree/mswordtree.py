@@ -5,7 +5,7 @@ from docx.oxml.table import CT_Tbl
 from docx.table import _Cell, Table
 from docx.text.paragraph import Paragraph
 import pandas as pd
-from Item import Item
+from mswordtree.Item import Item
 
 def iter_block_items(parent):
     if isinstance(parent, _Document):
