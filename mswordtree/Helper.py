@@ -1,17 +1,15 @@
-    
+
 def recurse(root, filename, nodes):    
-    skip = False
-    for child in root.Items:
-        if skip == False:
-            skip = True
-            continue
+    
+    for child in root.GetContent():        
         obj = JsonObject_Item(filename, root, child)        
         nodes.append(obj)        
 
-    for child in root.GetSubHeadings():        
+    for child in root.GetSubHeadings():
+        obj = JsonObject_Item(filename, root, child)        
+        nodes.append(obj)
         recurse(child, filename, nodes)
 
-    
 def ToString(roots):
     nodes = []
     for root in roots: 

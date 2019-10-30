@@ -5,7 +5,7 @@ from docx.oxml.table import CT_Tbl
 from docx.table import _Cell, Table
 from docx.text.paragraph import Paragraph
 import pandas as pd
-from mswordtree.Item import Item
+from Item import Item
 
 def iter_block_items(parent):
     if isinstance(parent, _Document):
@@ -24,20 +24,43 @@ def iter_block_items(parent):
             
 def ParseTableToDataFrame(table):
     data = []
-
     keys = None
+    
+    gtext = [] # horizontal row text
+    isVertical = True
     for i, row in enumerate(table.rows):
-        text = (cell.text for cell in row.cells)
-
+        text = list((cell.text for cell in row.cells))
         if i == 0:
-            keys = tuple(text)
-            continue
-       
-        row_data = dict(zip(keys, text))    
-           
-        data.append(row_data)
-        
+            # if its a vertical table, its heading will have bold property
+            try:
+                #if all([cell.paragraphs[0].runs[0].font.bold for cell in row.cells]) or len(table.columns) > 2:
 
+                isVertical = all([cell.paragraphs[0].runs[0].font.bold for cell in row.cells])
+            except:
+                isVertical = True
+                
+            if isVertical == True:            
+                keys = tuple(text)                
+                continue
+            # else its a horizontal table
+            else:  
+                keys = [key for key in ((cell.text for cell in table.columns[0].cells))]                
+                    
+        if isVertical == False: 
+            if len(text) > 0:            
+                try:
+                    va = text[1]
+                    gtext.append(va)
+                except:
+                    continue
+        else: 
+            row_data = dict(zip(keys, text)) 
+            data.append(row_data)
+     
+    if isVertical == False:        
+        row_data = dict(zip(keys, gtext)) 
+        data.append(row_data) 
+        
     df = pd.DataFrame(data)
     df = df.fillna('')
     return df
@@ -82,7 +105,7 @@ def CreateHeading(block):
     # Get the last heading from the parent and then make that heading the parent of this newly created heading
     elif ((parentLevel + 1) < itemLevel):         
        
-        parent = GetLastHeading()                          
+        parent = GetLastHeading(parent)                          
         parent.Items.append(item)
         item.Parent = parent
         
@@ -107,10 +130,11 @@ def FindParent(par, item):
         return par
 
     
-def GetLastHeading():
-     for i in reversed(parent.Items):
+def GetLastHeading(pare):
+    for i in reversed(parent.Items):
             if 'Heading' in i.Type:
                 return i
+    return pare
                 
 def AddParagraph(head, block):
     item = Item()
@@ -159,9 +183,3 @@ def GetWordDocTree(filename):
             
     root.Content = filename       
     return root        
-
-    #return {"root": root, "filename": filename}    
-    
-        
-        
-        
