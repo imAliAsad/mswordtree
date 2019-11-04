@@ -91,11 +91,28 @@ def CreateHeading(block):
     itemLevel = GetHeadingLevel(item.Type)
     
     
-    # If the heading is new then add it to the root level
-    if (GetHeadingLevel(item.Type) == 1): 
+
+    if parent.Parent:
+        if (parent.Parent.Type == 'root' and parentLevel == itemLevel):
+            root.Items.append(item) 
+            item.Parent = root#item
+            parent = item
+            return item
+
+    if parent.Type == 'root': 
         root.Items.append(item) 
         item.Parent = root#item
         parent = item
+        return item
+
+    # If the heading is new then add it to the root level
+    if ((GetHeadingLevel(item.Type) == 1)): 
+        root.Items.append(item) 
+        item.Parent = root#item
+        parent = item
+
+    
+
     
     # Check if the new heading is a subheading of its parent or not
     elif ((parentLevel + 1) == itemLevel):
@@ -103,15 +120,16 @@ def CreateHeading(block):
         item.Parent = parent
     
     # Get the last heading from the parent and then make that heading the parent of this newly created heading
-    elif ((parentLevel + 1) < itemLevel):         
-       
+    elif ((parentLevel + 1) < itemLevel):
         parent = GetLastHeading(parent)                          
         parent.Items.append(item)
         item.Parent = parent
+
+    
+    
         
     # Find the relivent parent and then add the new heading to its parent heading
-    elif ((parentLevel + 1) > itemLevel):         
-         
+    elif ((parentLevel + 1) > itemLevel): 
         parent = FindParent(parent, item)
         parent.Items.append(item)
         item.Parent = parent
